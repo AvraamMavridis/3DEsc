@@ -32,6 +32,8 @@ public class PlayerController : MonoBehaviour
     private AnimatorStateInfo AnimationState;
     public SkeletonWrapper sw;
     public Animator anim;
+    public static float speedFactor;
+    public static float rotationFactor;
 
 
     #endregion
@@ -41,13 +43,14 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-   
+        speedFactor = 150;
+        rotationFactor = 100;
     }
 
     void Update()
     {
         ArrowMovement();
-
+        
         if (sw.pollSkeleton())
         {
             NewRightHandPosition = sw.bonePos[0, (int)Bones.HandRight].y;
@@ -57,7 +60,7 @@ public class PlayerController : MonoBehaviour
 
             //Rotate the player based on hip position
 
-            rigidbody.AddTorque(new Vector3(0, 15000F*(NewHipPosition - OldHipPosition), 0));
+            rigidbody.AddTorque(new Vector3(0, rotationFactor * (NewHipPosition - OldHipPosition), 0));
 
             if (DifferenceBetweenOldAndNewHipPosition < 0.05)
             {
@@ -73,7 +76,7 @@ public class PlayerController : MonoBehaviour
             DifferenceBetweenOldAndNewHipZetPosition = Math.Abs(OldHipPosition - NewHipPosition);
 
             float speed = Math.Max(DifferenceBetweenOldAndNewRightHandPosition, DifferenceBetweenOldAndNewLeftHandPosition);
-            rigidbody.AddForce(rigidbody.transform.TransformDirection(Vector3.forward * speed*150));
+            rigidbody.AddForce(rigidbody.transform.TransformDirection(Vector3.forward * speed * speedFactor));
 
            
 
@@ -126,11 +129,23 @@ public class PlayerController : MonoBehaviour
 
     void ArrowMovement()
     {
-        rigidbody.AddForce(rigidbody.transform.TransformDirection(Vector3.forward * Input.GetAxis("Vertical") * 30));
+        if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow))
+        {
+            anim.SetInteger("Animation", 1);
+            print(speedFactor);
+           
+            rigidbody.AddForce(rigidbody.transform.TransformDirection(Vector3.forward * Input.GetAxis("Vertical") * speedFactor));
+            
+        }
+        else
+        {
+            anim.SetInteger("Animation", 0);
+            rigidbody.velocity = new Vector3(0, 0, 0);
+        }
 
         if (Input.GetKey(KeyCode.LeftArrow) || (Input.GetKey(KeyCode.RightArrow)))
         {
-            rigidbody.AddTorque(new Vector3(0, 500F * Input.GetAxis("Horizontal"), 0));
+            rigidbody.AddTorque(new Vector3(0, rotationFactor * Input.GetAxis("Horizontal"), 0));
         }
         else
         {
