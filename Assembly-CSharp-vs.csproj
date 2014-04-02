@@ -46,7 +46,8 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\CubeMovement.cs" />
+     <Compile Include="Assets\Script\CameraMovement.cs" />
+     <Compile Include="Assets\Script\CubeMovement.cs" />
      <Compile Include="Assets\Script\HumanBones.cs" />
      <Compile Include="Assets\Script\Kinect\KinectImgControllers\DisplayColor.cs" />
      <Compile Include="Assets\Script\Kinect\KinectImgControllers\DisplayDepth.cs" />

@@ -46,7 +46,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-      
+        ArrowMovement();
 
         if (sw.pollSkeleton())
         {
@@ -57,7 +57,7 @@ public class PlayerController : MonoBehaviour
 
             //Rotate the player based on hip position
 
-            rigidbody.AddTorque(new Vector3(0, 500F*(NewHipPosition - OldHipPosition), 0));
+            rigidbody.AddTorque(new Vector3(0, 15000F*(NewHipPosition - OldHipPosition), 0));
 
             if (DifferenceBetweenOldAndNewHipPosition < 0.05)
             {
@@ -66,14 +66,14 @@ public class PlayerController : MonoBehaviour
             }
             
 
-            //Get the difference between old a new position
+            //Get the difference between old a new positions
             DifferenceBetweenOldAndNewRightHandPosition = Math.Abs(OldRightHandPosition - NewRightHandPosition);
             DifferenceBetweenOldAndNewLeftHandPosition = Math.Abs(OldLeftHandPosition - NewLeftHandPosition);
             DifferenceBetweenOldAndNewHipPosition = Math.Abs(OldHipZetPosition - NewHipZetPosition);
             DifferenceBetweenOldAndNewHipZetPosition = Math.Abs(OldHipPosition - NewHipPosition);
 
             float speed = Math.Max(DifferenceBetweenOldAndNewRightHandPosition, DifferenceBetweenOldAndNewLeftHandPosition);
-            rigidbody.AddForce(rigidbody.transform.TransformDirection(Vector3.forward * speed*100));
+            rigidbody.AddForce(rigidbody.transform.TransformDirection(Vector3.forward * speed*150));
 
            
 
@@ -123,35 +123,18 @@ public class PlayerController : MonoBehaviour
       
     }
 
-    void FixedUpdate()
+
+    void ArrowMovement()
     {
+        rigidbody.AddForce(rigidbody.transform.TransformDirection(Vector3.forward * Input.GetAxis("Vertical") * 30));
 
-        
-
-    }
-
-    void changeDirection()
-    {
-        float Hip_Center_X = sw.bonePos[0, (int)Bones.HipCenter].x;
-
-        if (sw.pollSkeleton())
+        if (Input.GetKey(KeyCode.LeftArrow) || (Input.GetKey(KeyCode.RightArrow)))
         {
-            if (Hip_Center_X > 0.25)
-            {
-                anim.SetInteger("direction", (int)Direction.right_idle);
-                dir = Direction.right_idle;
-            }
-            else if (Hip_Center_X < -0.25)
-            {
-                anim.SetInteger("direction", (int)Direction.left_idle);
-                dir = Direction.left_idle;
-            }
-            else if (Hip_Center_X < 0.25 && Hip_Center_X > -0.25)
-            {
-                anim.SetInteger("direction", (int)Direction.up_idle);
-                dir = Direction.up_idle;
-            }
-
+            rigidbody.AddTorque(new Vector3(0, 500F * Input.GetAxis("Horizontal"), 0));
+        }
+        else
+        {
+            rigidbody.angularVelocity = Vector3.zero;
         }
     }
     
