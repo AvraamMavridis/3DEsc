@@ -46,6 +46,8 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\MainLightController.cs" />
+     <Compile Include="Assets\PlayerTorchController.cs" />
      <Compile Include="Assets\Script\CameraMovement.cs" />
      <Compile Include="Assets\Script\GuiComponents.cs" />
      <Compile Include="Assets\Script\HumanBones.cs" />
