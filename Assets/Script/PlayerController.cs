@@ -26,7 +26,7 @@ public class PlayerController : MonoBehaviour
     private float DifferenceBetweenOldAndNewHipPosition = 0;
     private float DifferenceBetweenOldAndNewHipZetPosition = 0;
     private float OldHipPosition = 0;
-    private float NewHipPosition = 0;
+    private float NewHipXPosition = 0;
     private float NewHipZetPosition = 0;
     private float OldHipZetPosition = 0;
     private AnimatorStateInfo AnimationState;
@@ -34,9 +34,9 @@ public class PlayerController : MonoBehaviour
     public Animator anim;
     public static float speedFactor;
     public static float rotationFactor;
-    public enum MoveType { KeyboardMovement, KinectMovement };
+    public enum MoveType { KeyboardMovement, KinectMovement, CenterPointKinectMovement };
     public static MoveType movement;
-
+    GameObject playercamera;
     #endregion
 
 
@@ -47,6 +47,8 @@ public class PlayerController : MonoBehaviour
         speedFactor = 150;
         rotationFactor = 134;
         movement = MoveType.KinectMovement;
+        playercamera = GameObject.Find("carlCamera");
+               
     }
 
     void Update()
@@ -58,6 +60,10 @@ public class PlayerController : MonoBehaviour
         else if (movement == MoveType.KeyboardMovement)
         {
             KeyboardMovement();
+        }
+        else if (movement == MoveType.CenterPointKinectMovement)
+        {
+            CenterPointKinectMovement();
         }
  
     }
@@ -93,27 +99,29 @@ public class PlayerController : MonoBehaviour
     //Move player using Kinect
     void KinectMovement() {
 
+       
+
         if (sw.pollSkeleton())
         {
             NewRightHandPosition = sw.bonePos[0, (int)Bones.HandRight].y;
             NewLeftHandPosition = sw.bonePos[0, (int)Bones.HandLeft].y;
-            NewHipPosition = sw.bonePos[0, (int)Bones.HipCenter].x;
+            NewHipXPosition = sw.bonePos[0, (int)Bones.HipCenter].x;
             NewHipZetPosition = sw.bonePos[0, (int)Bones.HipCenter].z;
 
             //Rotate the player based on hip position
-            rigidbody.AddTorque(new Vector3(0, rotationFactor * (NewHipPosition - OldHipPosition), 0));
+            rigidbody.AddTorque(new Vector3(0, rotationFactor * (NewHipXPosition - OldHipPosition), 0));
             if (DifferenceBetweenOldAndNewHipPosition < 0.05)
             {
                 rigidbody.angularVelocity = Vector3.zero;
 
             }
 
-
+            changeLight();
             //Get the difference between old a new positions
             DifferenceBetweenOldAndNewRightHandPosition = Math.Abs(OldRightHandPosition - NewRightHandPosition);
             DifferenceBetweenOldAndNewLeftHandPosition = Math.Abs(OldLeftHandPosition - NewLeftHandPosition);
             DifferenceBetweenOldAndNewHipPosition = Math.Abs(OldHipZetPosition - NewHipZetPosition);
-            DifferenceBetweenOldAndNewHipZetPosition = Math.Abs(OldHipPosition - NewHipPosition);
+            DifferenceBetweenOldAndNewHipZetPosition = Math.Abs(OldHipPosition - NewHipXPosition);
 
             float forceByHands = Math.Max(DifferenceBetweenOldAndNewRightHandPosition, DifferenceBetweenOldAndNewLeftHandPosition);
             rigidbody.AddForce(rigidbody.transform.TransformDirection((new Vector3(0, 0, 1)) * forceByHands * speedFactor));
@@ -133,14 +141,91 @@ public class PlayerController : MonoBehaviour
 
             OldRightHandPosition = NewRightHandPosition;
             OldLeftHandPosition = NewLeftHandPosition;
-            OldHipPosition = NewHipPosition;
+            OldHipPosition = NewHipXPosition;
             OldHipZetPosition = NewHipZetPosition;
         } 
 
     
     }
+
+    void CenterPointKinectMovement() {
+        if (sw.pollSkeleton())
+        {
+            NewRightHandPosition = sw.bonePos[0, (int)Bones.HandRight].y;
+            NewLeftHandPosition = sw.bonePos[0, (int)Bones.HandLeft].y;
+            NewHipXPosition = sw.bonePos[0, (int)Bones.HipCenter].x;
+            NewHipZetPosition = sw.bonePos[0, (int)Bones.HipCenter].z;
+
+
+            //Get the difference between old a new positions
+            DifferenceBetweenOldAndNewRightHandPosition = Math.Abs(OldRightHandPosition - NewRightHandPosition);
+            DifferenceBetweenOldAndNewLeftHandPosition = Math.Abs(OldLeftHandPosition - NewLeftHandPosition);
+            DifferenceBetweenOldAndNewHipPosition = Math.Abs(OldHipZetPosition - NewHipZetPosition);
+            DifferenceBetweenOldAndNewHipZetPosition = Math.Abs(OldHipPosition - NewHipXPosition);
+
+            float forceByHands = Math.Max(DifferenceBetweenOldAndNewRightHandPosition, DifferenceBetweenOldAndNewLeftHandPosition);
+            rigidbody.AddForce(rigidbody.transform.TransformDirection((new Vector3(0, 0, 1)) * forceByHands * speedFactor));
+
+
+            
+
+            double hypotenusePower2 = Math.Pow(NewHipXPosition, 2) + Math.Pow(NewHipZetPosition, 2);
+            double hypotenuse = Math.Sqrt(hypotenusePower2);
+            double angle = Math.Asin(NewHipZetPosition / hypotenuse);
+            double degrees = angle * (180 / Math.PI);
+            
+            if (NewHipZetPosition > 0 && NewHipXPosition > 0)
+            {
+                rigidbody.transform.rotation = Quaternion.Euler(0, (float)(90 - Math.Abs(degrees)), 0);
+            }
+            else if (NewHipZetPosition < 0 && NewHipXPosition > 0)
+            {
+                rigidbody.transform.rotation = Quaternion.Euler(0, (float)(90 + Math.Abs(degrees)), 0);
+            }
+            else if (NewHipZetPosition < 0 && NewHipXPosition < 0)
+            {
+                rigidbody.transform.rotation = Quaternion.Euler(0, (float)(-90 - Math.Abs(degrees)), 0);
+            }
+            else if (NewHipZetPosition > 0 && NewHipXPosition < 0)
+            {
+                rigidbody.transform.rotation = Quaternion.Euler(0, (float)(-90 + Math.Abs(degrees)), 0);
+            }
+
+
+            //Animate
+            if (forceByHands > 0.03)
+            {
+                anim.SetInteger("Animation", 1);
+            }
+            else
+            {
+                anim.SetInteger("Animation", 0);
+            }
+
+
+            OldRightHandPosition = NewRightHandPosition;
+            OldLeftHandPosition = NewLeftHandPosition;
+            OldHipPosition = NewHipXPosition;
+            OldHipZetPosition = NewHipZetPosition;
+        } 
     
-    
+    }
+
+
+    void changeLight()
+    {
+
+        if (NewHipZetPosition < 0.2 && NewHipZetPosition > -0.2 && NewHipXPosition < 0.2 && NewHipXPosition > -0.2)
+        {
+            playercamera.light.color = Color.green;
+        }
+        else
+        {
+            playercamera.light.color = new Color(Math.Abs((float)NewHipZetPosition), 0F, 0F, 1F);
+        }
+
+
+    }
 }
 
 
