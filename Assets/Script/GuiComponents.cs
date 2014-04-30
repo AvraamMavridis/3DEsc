@@ -5,6 +5,7 @@ public class GuiComponents : MonoBehaviour {
 
     GameObject player;
     GameObject cameraView;
+    GameObject mainCamera;
     GameObject miniMap;
     GameObject mainLight;
     bool GUIEnabled = false;
@@ -13,12 +14,14 @@ public class GuiComponents : MonoBehaviour {
 	void Start () {
         player = GameObject.Find("carl");
         cameraView = GameObject.Find("ColorImagePlane");
+        mainCamera = GameObject.Find("carlCamera");
         miniMap = GameObject.Find("MiniMap");
         mainLight = GameObject.Find("MainLight");
-        movementlabel = "hipCenter";
+        movementlabel = "Horizontal body movement";
         miniMap.camera.enabled = false;
         cameraView.renderer.enabled = false;
         mainLight.light.enabled = false;
+        PlayerController.circleradious = 0;
 	}
 	
 	// Update is called once per frame
@@ -42,22 +45,28 @@ public class GuiComponents : MonoBehaviour {
                 PlayerController.movement = PlayerController.MoveType.KinectMovement;
                 PlayerController.speedFactor = 150;
                 PlayerController.rotationFactor = 134;
-                movementlabel = "hipCenter";
+                movementlabel = "Horizontal body movement";
             }
             else if (PlayerController.movement == PlayerController.MoveType.KinectMovement)
             {
                 PlayerController.movement = PlayerController.MoveType.CenterPointKinectMovement;
                 PlayerController.speedFactor = 150;
                 PlayerController.rotationFactor = 134;
-                movementlabel = "centerpoint";
+                movementlabel = "Central Point with hands for speed";
             }
             else if (PlayerController.movement == PlayerController.MoveType.CenterPointKinectMovement)
             {
+                PlayerController.movement = PlayerController.MoveType.CenterPointKinectWithoutHands;
+                PlayerController.rotationFactor = 15;
+                PlayerController.speedFactor = 50;
+                movementlabel = "Central Point without hands for speed";
+            }
+            else if (PlayerController.movement == PlayerController.MoveType.CenterPointKinectWithoutHands)
+            {
                 PlayerController.movement = PlayerController.MoveType.KeyboardMovement;
-                PlayerController.rotationFactor = 80;
-                PlayerController.speedFactor = 15;
-                movementlabel = "centerpoint";
-                movementlabel = "keyboard";
+                PlayerController.rotationFactor = 15;
+                PlayerController.speedFactor = 50;
+                movementlabel = "Keyaboard";
             }
         }
 
@@ -94,14 +103,21 @@ public class GuiComponents : MonoBehaviour {
     void OnGUI() {
         if (GUIEnabled)
         {
-            GUI.Box(new Rect(0, 0, 550, 150), "Information");
+            GUI.Box(new Rect(0, 0, 550, 150), "Movement type : " + movementlabel);
             GUI.Label(new Rect(3, 20, 150, 20), "Speed Factor: " + PlayerController.speedFactor.ToString());
-            PlayerController.speedFactor = GUI.HorizontalSlider(new Rect(160, 25, 350, 20), PlayerController.speedFactor, 0.0F, 5000F);
+            PlayerController.speedFactor = GUI.HorizontalSlider(new Rect(160, 25, 350, 20), PlayerController.speedFactor, 0.0F, 100F);
             GUI.Label(new Rect(3, 40, 150, 20), "Velocity: " + (player.rigidbody.velocity.magnitude).ToString());
-            GUI.Label(new Rect(3, 60, 150, 20), "Rotation Factor: " + PlayerController.rotationFactor.ToString());
-            PlayerController.rotationFactor = GUI.HorizontalSlider(new Rect(160, 65, 350, 20), PlayerController.rotationFactor, 0.0F, 1000F);
-            GUI.Label(new Rect(3, 80, 150, 20), "Angular Velocity: " + (player.rigidbody.angularVelocity.magnitude).ToString());
-            GUI.Label(new Rect(3, 100, 150, 20),  movementlabel);           
+            if((PlayerController.movement == PlayerController.MoveType.KinectMovement)|| (PlayerController.movement == PlayerController.MoveType.KeyboardMovement)){
+                GUI.Label(new Rect(3, 60, 150, 20), "Rotation Factor: " + PlayerController.rotationFactor.ToString());
+                PlayerController.rotationFactor = GUI.HorizontalSlider(new Rect(160, 65, 350, 20), PlayerController.rotationFactor, 0.0F, 1000F);
+                GUI.Label(new Rect(3, 80, 150, 20), "Angular Velocity: " + (player.rigidbody.angularVelocity.magnitude).ToString());
+            }
+            else if (PlayerController.movement == PlayerController.MoveType.CenterPointKinectWithoutHands) {
+                GUI.Label(new Rect(3, 60, 150, 20), "No-speed circle radious: " + PlayerController.circleradious);
+                PlayerController.circleradious = GUI.HorizontalSlider(new Rect(160, 65, 350, 20), PlayerController.circleradious, 0.0F, 1000F);
+            }
+            GUI.Label(new Rect(3, 100, 150, 20), "Camera distance: " + mainCamera.transform.position.y);
+            mainCamera.transform.position = new Vector3(mainCamera.transform.position.x, GUI.HorizontalSlider(new Rect(160, 105, 350, 20), mainCamera.transform.position.y, 0.0F, 100F), mainCamera.transform.position.z);
         }
 
     }

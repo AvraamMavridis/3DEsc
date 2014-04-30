@@ -34,7 +34,8 @@ public class PlayerController : MonoBehaviour
     public Animator anim;
     public static float speedFactor;
     public static float rotationFactor;
-    public enum MoveType { KeyboardMovement, KinectMovement, CenterPointKinectMovement };
+    public static float circleradious; //for CenterPointKinectWithoutHands
+    public enum MoveType { KeyboardMovement, KinectMovement, CenterPointKinectMovement, CenterPointKinectWithoutHands };
     public static MoveType movement;
     GameObject playercamera;
     #endregion
@@ -64,6 +65,10 @@ public class PlayerController : MonoBehaviour
         else if (movement == MoveType.CenterPointKinectMovement)
         {
             CenterPointKinectMovement();
+        }
+        else if (movement == MoveType.CenterPointKinectWithoutHands)
+        {
+            CenterPointKinectWithoutHands();
         }
  
     }
@@ -148,7 +153,8 @@ public class PlayerController : MonoBehaviour
     
     }
 
-    void CenterPointKinectMovement() {
+    void CenterPointKinectMovement()
+    {
         if (sw.pollSkeleton())
         {
             NewRightHandPosition = sw.bonePos[0, (int)Bones.HandRight].y;
@@ -211,17 +217,73 @@ public class PlayerController : MonoBehaviour
     
     }
 
+    void CenterPointKinectWithoutHands()
+    {
+        if (sw.pollSkeleton())
+        {
+            NewRightHandPosition = sw.bonePos[0, (int)Bones.HandRight].y;
+            NewLeftHandPosition = sw.bonePos[0, (int)Bones.HandLeft].y;
+            NewHipXPosition = sw.bonePos[0, (int)Bones.HipCenter].x;
+            NewHipZetPosition = sw.bonePos[0, (int)Bones.HipCenter].z;
+
+
+            //Get the difference between old a new positions
+            DifferenceBetweenOldAndNewRightHandPosition = Math.Abs(OldRightHandPosition - NewRightHandPosition);
+            DifferenceBetweenOldAndNewLeftHandPosition = Math.Abs(OldLeftHandPosition - NewLeftHandPosition);
+            DifferenceBetweenOldAndNewHipPosition = Math.Abs(OldHipZetPosition - NewHipZetPosition);
+            DifferenceBetweenOldAndNewHipZetPosition = Math.Abs(OldHipPosition - NewHipXPosition);
+
+
+            //Distance between two points, between the center(0,0) and the position of the players body(x,z)
+            float force = (float)Math.Sqrt(Math.Pow(NewHipXPosition, 2) + Math.Pow(NewHipZetPosition, 2));
+            print(force);
+            //Speed
+            rigidbody.AddForce(rigidbody.transform.TransformDirection((new Vector3(0, 0, 1)) * force * speedFactor));
+
+            //Rotation
+            double hypotenusePower2 = Math.Pow(NewHipXPosition, 2) + Math.Pow(NewHipZetPosition, 2);
+            double hypotenuse = Math.Sqrt(hypotenusePower2);
+            double angle = Math.Asin(NewHipZetPosition / hypotenuse);
+            double degrees = angle * (180 / Math.PI);
+
+            if (NewHipZetPosition > 0 && NewHipXPosition > 0)
+            {
+                rigidbody.transform.rotation = Quaternion.Euler(0, (float)(90 - Math.Abs(degrees)), 0);
+            }
+            else if (NewHipZetPosition < 0 && NewHipXPosition > 0)
+            {
+                rigidbody.transform.rotation = Quaternion.Euler(0, (float)(90 + Math.Abs(degrees)), 0);
+            }
+            else if (NewHipZetPosition < 0 && NewHipXPosition < 0)
+            {
+                rigidbody.transform.rotation = Quaternion.Euler(0, (float)(-90 - Math.Abs(degrees)), 0);
+            }
+            else if (NewHipZetPosition > 0 && NewHipXPosition < 0)
+            {
+                rigidbody.transform.rotation = Quaternion.Euler(0, (float)(-90 + Math.Abs(degrees)), 0);
+            }
+
+
+        
+            OldRightHandPosition = NewRightHandPosition;
+            OldLeftHandPosition = NewLeftHandPosition;
+            OldHipPosition = NewHipXPosition;
+            OldHipZetPosition = NewHipZetPosition;
+        }
+
+    }
+
 
     void changeLight()
     {
 
-        if (NewHipZetPosition < 0.2 && NewHipZetPosition > -0.2 && NewHipXPosition < 0.2 && NewHipXPosition > -0.2)
+        if (NewHipZetPosition < 0.25 && NewHipZetPosition > -0.25 && NewHipXPosition < 0.25 && NewHipXPosition > -0.2)
         {
-            playercamera.light.color = Color.green;
+            playercamera.light.color = new Color(1F - Math.Abs((float)NewHipZetPosition), Math.Abs((float)NewHipZetPosition), 0F, 1F);
         }
         else
         {
-            playercamera.light.color = new Color(Math.Abs((float)NewHipZetPosition), 0F, 0F, 1F);
+            playercamera.light.color = new Color(Math.Abs((float)NewHipZetPosition), 1F - Math.Abs((float)NewHipZetPosition), 0F, 1F);
         }
 
 
