@@ -236,9 +236,20 @@ public class PlayerController : MonoBehaviour
 
             //Distance between two points, between the center(0,0) and the position of the players body(x,z)
             float force = (float)Math.Sqrt(Math.Pow(NewHipXPosition, 2) + Math.Pow(NewHipZetPosition, 2));
-            print(force);
+
+
             //Speed
-            rigidbody.AddForce(rigidbody.transform.TransformDirection((new Vector3(0, 0, 1)) * force * speedFactor));
+            if (Math.Abs(NewHipZetPosition) > circleradious)
+            {
+                rigidbody.AddForce(rigidbody.transform.TransformDirection((new Vector3(0, 0, 1)) * force * speedFactor));
+                anim.SetInteger("Animation", 1);
+            }
+            else
+            {
+                anim.SetInteger("Animation", 0);
+            }
+
+        
 
             //Rotation
             double hypotenusePower2 = Math.Pow(NewHipXPosition, 2) + Math.Pow(NewHipZetPosition, 2);
