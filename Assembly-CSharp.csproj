@@ -5,7 +5,7 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{8473ED9C-072F-029B-5F24-E28E7C475157}</ProjectGuid>
+	<ProjectGuid>{07D9DFEC-8E1B-150A-1F72-CAC9CE48876C}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
@@ -48,6 +48,7 @@
   <ItemGroup>
      <Compile Include="Assets\Script\CameraMovement.cs" />
      <Compile Include="Assets\Script\Guard1.cs" />
+     <Compile Include="Assets\Script\Guard2.cs" />
      <Compile Include="Assets\Script\GuiComponents.cs" />
      <Compile Include="Assets\Script\HumanBones.cs" />
      <Compile Include="Assets\Script\Kinect\KinectImgControllers\DisplayColor.cs" />
@@ -64,6 +65,7 @@
      <Compile Include="Assets\Script\MainLightController.cs" />
      <Compile Include="Assets\Script\PlayerController.cs" />
      <Compile Include="Assets\Script\PlayerTorchController.cs" />
+     <Compile Include="Assets\Script\States.cs" />
      <None Include="Assets\Asset\Shaders\Normal-Diffuse.shader" />
      <None Include="Assets\Raw Mocap Data\Animations\_CompleteAnimationList.txt" />
   </ItemGroup>

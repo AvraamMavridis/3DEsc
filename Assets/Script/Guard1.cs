@@ -1,46 +1,58 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Assets.Script;
 
-public class Guard1 : MonoBehaviour {
+
+public class Guard1 : MonoBehaviour{
 
     GameObject player;
     GameObject guard;
 
-    enum State {Right=0,Left, MovingRight, MovingLeft};
-    State state;
-    
+
+    public static States state;
+    private float starttime;
+
+ 
     // Use this for initialization
     void Start()
     {
         player = GameObject.Find("carl");
         guard = GameObject.Find("guard");
-        state = State.MovingRight;
+        state = States.MovingRight; 
+        
     }
 
 
 	
 	// Update is called once per frame
 	void Update () {
-        if (rigidbody.transform.position.x > -15 && state==State.MovingRight)
+
+
+        if (rigidbody.transform.position.x > -15 && state == States.MovingRight)
         {
-            rigidbody.AddForce(rigidbody.transform.TransformDirection((new Vector3(0, 0, 1)) * 5));
+            //rigidbody.AddForce(rigidbody.transform.TransformDirection((new Vector3(0, 0, 1)) * 5));
+            rigidbody.transform.position = new Vector3(rigidbody.transform.position.x - 0.05f, rigidbody.transform.position.y, rigidbody.transform.position.z);       
         }
-        else if (rigidbody.transform.position.x < -15 && state==State.MovingRight)
+        else if ((int)rigidbody.transform.position.x == -15 && state == States.MovingRight)
         {
             rigidbody.transform.Rotate(new Vector3(0, 180, 0));
-            state = State.MovingLeft;
+            state = States.MovingLeft;
+            print("Edo");
         }
-        else if (rigidbody.transform.position.x > -17.7 && state == State.MovingLeft && rigidbody.transform.position.x < 0)
+        else if (rigidbody.transform.position.x < 0 && state == States.MovingLeft)
         {
-            rigidbody.AddForce(rigidbody.transform.TransformDirection((new Vector3(0, 0, 1)) * 5));
+           rigidbody.transform.position = new Vector3(rigidbody.transform.position.x + 0.05f, rigidbody.transform.position.y, rigidbody.transform.position.z);
         }
-        else if (rigidbody.transform.position.x > 0 && state == State.MovingLeft) {
+        else if ((int)rigidbody.transform.position.x == 0 && state == States.MovingLeft)
+        {
             rigidbody.transform.Rotate(new Vector3(0, 180, 0));
-            state = State.MovingRight;
+            state = States.MovingRight;
         }
-
-
-        
-
+      
 	}
+
+    public void setState(States s)
+    {
+        state = s;
+    }
 }

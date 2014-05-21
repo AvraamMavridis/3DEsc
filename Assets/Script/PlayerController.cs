@@ -10,6 +10,7 @@ using UnityEngine;
 using System;
 using System.Collections;
 using HumanBones;
+using Assets.Script;
 
 public class PlayerController : MonoBehaviour
 {
@@ -32,6 +33,9 @@ public class PlayerController : MonoBehaviour
     private AnimatorStateInfo AnimationState;
     public SkeletonWrapper sw;
     public Animator anim;
+    GameObject player;
+    Guard1 guard;
+    Guard2 guard2;
     public static float speedFactor;
     public static float rotationFactor;
     public static float circleradious; //for CenterPointKinectWithoutHands
@@ -49,6 +53,9 @@ public class PlayerController : MonoBehaviour
         rotationFactor = 134;
         movement = MoveType.KinectMovement;
         playercamera = GameObject.Find("carlCamera");
+        player = GameObject.Find("carl");
+        guard = GameObject.FindObjectOfType<Guard1>();
+        guard2 = GameObject.FindObjectOfType<Guard2>();
                
     }
 
@@ -236,20 +243,9 @@ public class PlayerController : MonoBehaviour
 
             //Distance between two points, between the center(0,0) and the position of the players body(x,z)
             float force = (float)Math.Sqrt(Math.Pow(NewHipXPosition, 2) + Math.Pow(NewHipZetPosition, 2));
-
-
+            print(force);
             //Speed
-            if (Math.Abs(NewHipZetPosition) > circleradious)
-            {
-                rigidbody.AddForce(rigidbody.transform.TransformDirection((new Vector3(0, 0, 1)) * force * speedFactor));
-                anim.SetInteger("Animation", 1);
-            }
-            else
-            {
-                anim.SetInteger("Animation", 0);
-            }
-
-        
+            rigidbody.AddForce(rigidbody.transform.TransformDirection((new Vector3(0, 0, 1)) * force * speedFactor));
 
             //Rotation
             double hypotenusePower2 = Math.Pow(NewHipXPosition, 2) + Math.Pow(NewHipZetPosition, 2);
@@ -297,6 +293,34 @@ public class PlayerController : MonoBehaviour
             playercamera.light.color = new Color(Math.Abs((float)NewHipZetPosition), 1F - Math.Abs((float)NewHipZetPosition), 0F, 1F);
         }
 
+
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        ContactPoint contact = collision.contacts[0];
+        Quaternion rot = Quaternion.FromToRotation(Vector3.up, contact.normal);
+        Vector3 pos = contact.point;
+        if (collision.collider.name == "guard" || collision.collider.name == "guard2")
+        {
+            reset();
+        }
+    }
+
+    void reset()
+    {
+        player.transform.position = new Vector3(1f, 0.5f, -45f);
+        player.transform.rotation = new Quaternion(0f, 0f, 0f, 0f);
+
+        guard.transform.position = new Vector3(-2f, 0.5f, -32f);
+        Quaternion guardrotation = Quaternion.Euler(new Vector3(0f, 270f, 0f));
+        guard.transform.rotation = guardrotation;
+        guard.setState(States.MovingRight);
+
+        guard2.transform.position = new Vector3(-35f, 0.5f, -33f);
+        Quaternion guard2rotation = Quaternion.Euler(new Vector3(0f, 0f, 0f));
+        guard2.transform.rotation = guard2rotation;
+        guard2.setState(States.MovingUp);
 
     }
 }

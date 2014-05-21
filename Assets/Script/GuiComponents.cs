@@ -113,8 +113,8 @@ public class GuiComponents : MonoBehaviour {
                 GUI.Label(new Rect(3, 80, 150, 20), "Angular Velocity: " + (player.rigidbody.angularVelocity.magnitude).ToString());
             }
             else if (PlayerController.movement == PlayerController.MoveType.CenterPointKinectWithoutHands) {
-                GUI.Label(new Rect(3, 60, 150, 40), "No-speed circle radious: " + PlayerController.circleradious.ToString());
-                PlayerController.circleradious = GUI.HorizontalSlider(new Rect(160, 65, 350, 20), PlayerController.circleradious, 0.0F, 3.0F);
+                GUI.Label(new Rect(3, 60, 150, 20), "No-speed circle radious: " + PlayerController.circleradious);
+                PlayerController.circleradious = GUI.HorizontalSlider(new Rect(160, 65, 350, 20), PlayerController.circleradious, 0.0F, 1000F);
             }
             GUI.Label(new Rect(3, 100, 150, 20), "Camera distance: " + mainCamera.transform.position.y);
             mainCamera.transform.position = new Vector3(mainCamera.transform.position.x, GUI.HorizontalSlider(new Rect(160, 105, 350, 20), mainCamera.transform.position.y, 0.0F, 100F), mainCamera.transform.position.z);
