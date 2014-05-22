@@ -58,7 +58,8 @@ public class GuiComponents : MonoBehaviour {
             {
                 PlayerController.movement = PlayerController.MoveType.CenterPointKinectWithoutHands;
                 PlayerController.rotationFactor = 15;
-                PlayerController.speedFactor = 50;
+                PlayerController.speedFactor = 15;
+                PlayerController.circleradious = 0.7f;
                 movementlabel = "Central Point without hands for speed";
             }
             else if (PlayerController.movement == PlayerController.MoveType.CenterPointKinectWithoutHands)
@@ -105,7 +106,7 @@ public class GuiComponents : MonoBehaviour {
         {
             GUI.Box(new Rect(0, 0, 550, 150), "Movement type : " + movementlabel);
             GUI.Label(new Rect(3, 20, 150, 20), "Speed Factor: " + PlayerController.speedFactor.ToString());
-            PlayerController.speedFactor = GUI.HorizontalSlider(new Rect(160, 25, 350, 20), PlayerController.speedFactor, 0.0F, 100F);
+            PlayerController.speedFactor = GUI.HorizontalSlider(new Rect(160, 25, 350, 20), PlayerController.speedFactor, 0.0F, 40F);
             GUI.Label(new Rect(3, 40, 150, 20), "Velocity: " + (player.rigidbody.velocity.magnitude).ToString());
             if((PlayerController.movement == PlayerController.MoveType.KinectMovement)|| (PlayerController.movement == PlayerController.MoveType.KeyboardMovement)){
                 GUI.Label(new Rect(3, 60, 150, 20), "Rotation Factor: " + PlayerController.rotationFactor.ToString());
@@ -113,11 +114,13 @@ public class GuiComponents : MonoBehaviour {
                 GUI.Label(new Rect(3, 80, 150, 20), "Angular Velocity: " + (player.rigidbody.angularVelocity.magnitude).ToString());
             }
             else if (PlayerController.movement == PlayerController.MoveType.CenterPointKinectWithoutHands) {
-                GUI.Label(new Rect(3, 60, 150, 20), "No-speed circle radious: " + PlayerController.circleradious);
-                PlayerController.circleradious = GUI.HorizontalSlider(new Rect(160, 65, 350, 20), PlayerController.circleradious, 0.0F, 1000F);
+                GUI.Label(new Rect(3, 60, 150, 40), "No-speed circle radious: " + PlayerController.circleradious);
+                PlayerController.circleradious = GUI.HorizontalSlider(new Rect(200, 65, 300, 20), PlayerController.circleradious, 0.0F, 2F);
+                PlayerController.slide = GUI.Toggle(new Rect(10, 100, 100, 30), PlayerController.slide, "Slide");
+                print(PlayerController.slide);
             }
-            GUI.Label(new Rect(3, 100, 150, 20), "Camera distance: " + mainCamera.transform.position.y);
-            mainCamera.transform.position = new Vector3(mainCamera.transform.position.x, GUI.HorizontalSlider(new Rect(160, 105, 350, 20), mainCamera.transform.position.y, 0.0F, 100F), mainCamera.transform.position.z);
+            GUI.Label(new Rect(3, 120, 150, 20), "Camera distance: " + mainCamera.transform.position.y);
+            mainCamera.transform.position = new Vector3(mainCamera.transform.position.x, GUI.HorizontalSlider(new Rect(160, 125, 350, 20), mainCamera.transform.position.y, 0.0F, 100F), mainCamera.transform.position.z);
         }
 
     }

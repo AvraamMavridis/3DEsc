@@ -39,6 +39,7 @@ public class PlayerController : MonoBehaviour
     public static float speedFactor;
     public static float rotationFactor;
     public static float circleradious; //for CenterPointKinectWithoutHands
+    public static bool slide = false;
     public enum MoveType { KeyboardMovement, KinectMovement, CenterPointKinectMovement, CenterPointKinectWithoutHands };
     public static MoveType movement;
     GameObject playercamera;
@@ -243,9 +244,8 @@ public class PlayerController : MonoBehaviour
 
             //Distance between two points, between the center(0,0) and the position of the players body(x,z)
             float force = (float)Math.Sqrt(Math.Pow(NewHipXPosition, 2) + Math.Pow(NewHipZetPosition, 2));
-            print(force);
-            //Speed
-            rigidbody.AddForce(rigidbody.transform.TransformDirection((new Vector3(0, 0, 1)) * force * speedFactor));
+            
+            
 
             //Rotation
             double hypotenusePower2 = Math.Pow(NewHipXPosition, 2) + Math.Pow(NewHipZetPosition, 2);
@@ -270,7 +270,23 @@ public class PlayerController : MonoBehaviour
                 rigidbody.transform.rotation = Quaternion.Euler(0, (float)(-90 + Math.Abs(degrees)), 0);
             }
 
+            changeLight();
 
+            //Animate
+            if (force > PlayerController.circleradious)
+            {
+                //Speed
+                rigidbody.AddForce(rigidbody.transform.TransformDirection((new Vector3(0, 0, 1)) * speedFactor));
+                anim.SetInteger("Animation", 1);
+            }
+            else
+            {
+                anim.SetInteger("Animation", 0);
+                if (PlayerController.slide == true)
+                {
+                    rigidbody.velocity = new Vector3(0f, 0f, 0f);
+                }
+            }
         
             OldRightHandPosition = NewRightHandPosition;
             OldLeftHandPosition = NewLeftHandPosition;
