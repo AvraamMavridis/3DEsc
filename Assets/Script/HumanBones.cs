@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 namespace HumanBones
 {
     public enum Bones
@@ -37,7 +36,6 @@ namespace HumanBones
         FootRight,
         PositionCount
     }
-
     public class BonesIndex
     {
         public static int getBoneIndex(Bones bone){
