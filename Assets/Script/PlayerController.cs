@@ -40,9 +40,11 @@ public class PlayerController : MonoBehaviour
     public static float rotationFactor;
     public static float circleradious; //for CenterPointKinectWithoutHands
     public static bool slide = false;
+    public static float maximumSpeed = 3;
     public enum MoveType { KeyboardMovement, KinectMovement, CenterPointKinectMovement, CenterPointKinectWithoutHands };
     public static MoveType movement;
     GameObject playercamera;
+    //System.IO.StreamWriter file;
     #endregion
 
 
@@ -57,6 +59,7 @@ public class PlayerController : MonoBehaviour
         player = GameObject.Find("carl");
         guard = GameObject.FindObjectOfType<Guard1>();
         guard2 = GameObject.FindObjectOfType<Guard2>();
+        //using (file = new System.IO.StreamWriter(@"C:\result.txt"));
                
     }
 
@@ -231,11 +234,10 @@ public class PlayerController : MonoBehaviour
             DifferenceBetweenOldAndNewHipZetPosition = Math.Abs(OldHipPosition - NewHipXPosition);
 
             float forceByHands = Math.Max(DifferenceBetweenOldAndNewRightHandPosition, DifferenceBetweenOldAndNewLeftHandPosition);
-            rigidbody.AddForce(rigidbody.transform.TransformDirection((new Vector3(0, 0, 1)) * forceByHands * speedFactor));
 
+            float force = (float)Math.Sqrt(Math.Pow(NewHipXPosition, 2) + Math.Pow(NewHipZetPosition, 2));
 
             
-
             double hypotenusePower2 = Math.Pow(NewHipXPosition, 2) + Math.Pow(NewHipZetPosition, 2);
             double hypotenuse = Math.Sqrt(hypotenusePower2);
             double angle = Math.Asin(NewHipZetPosition / hypotenuse);
@@ -259,6 +261,14 @@ public class PlayerController : MonoBehaviour
             }
 
 
+            //file.WriteLine(player.rigidbody.velocity.magnitude);
+            if (player.rigidbody.velocity.magnitude < 3)
+            {
+                rigidbody.AddForce(rigidbody.transform.TransformDirection((new Vector3(0, 0, 1)) * forceByHands * speedFactor));
+            }
+
+            changeLight();
+
             //Animate
             if (forceByHands > 0.03)
             {
@@ -267,6 +277,10 @@ public class PlayerController : MonoBehaviour
             else
             {
                 anim.SetInteger("Animation", 0);
+                if (PlayerController.slide == true)
+                {
+                    rigidbody.velocity = new Vector3(0f, 0f, 0f);
+                }
             }
 
 
@@ -282,23 +296,19 @@ public class PlayerController : MonoBehaviour
     {
         if (sw.pollSkeleton())
         {
-            NewRightHandPosition = sw.bonePos[0, (int)Bones.HandRight].y;
-            NewLeftHandPosition = sw.bonePos[0, (int)Bones.HandLeft].y;
+
             NewHipXPosition = sw.bonePos[0, (int)Bones.HipCenter].x;
             NewHipZetPosition = sw.bonePos[0, (int)Bones.HipCenter].z;
 
 
             //Get the difference between old a new positions
-            DifferenceBetweenOldAndNewRightHandPosition = Math.Abs(OldRightHandPosition - NewRightHandPosition);
-            DifferenceBetweenOldAndNewLeftHandPosition = Math.Abs(OldLeftHandPosition - NewLeftHandPosition);
             DifferenceBetweenOldAndNewHipPosition = Math.Abs(OldHipZetPosition - NewHipZetPosition);
             DifferenceBetweenOldAndNewHipZetPosition = Math.Abs(OldHipPosition - NewHipXPosition);
 
 
             //Distance between two points, between the center(0,0) and the position of the players body(x,z)
             float force = (float)Math.Sqrt(Math.Pow(NewHipXPosition, 2) + Math.Pow(NewHipZetPosition, 2));
-            
-            
+              
 
             //Rotation
             double hypotenusePower2 = Math.Pow(NewHipXPosition, 2) + Math.Pow(NewHipZetPosition, 2);
@@ -325,11 +335,14 @@ public class PlayerController : MonoBehaviour
 
             changeLight();
 
+            
+
             //Animate
             if (force > PlayerController.circleradious)
             {
                 //Speed
-                rigidbody.AddForce(rigidbody.transform.TransformDirection((new Vector3(0, 0, 1)) * speedFactor));
+                if (player.rigidbody.velocity.magnitude < maximumSpeed)
+                    rigidbody.AddForce(rigidbody.transform.TransformDirection((new Vector3(0, 0, 1)) * speedFactor * force));
                 anim.SetInteger("Animation", 1);
             }
             else
@@ -341,66 +354,13 @@ public class PlayerController : MonoBehaviour
                 }
             }
         
-            OldRightHandPosition = NewRightHandPosition;
-            OldLeftHandPosition = NewLeftHandPosition;
             OldHipPosition = NewHipXPosition;
             OldHipZetPosition = NewHipZetPosition;
         }
 
     }
 
-    //Move character by moving to the sides
-    void KinectMovementWithoutHands()
-    {
-
-
-
-        if (sw.pollSkeleton())
-        {
-            NewRightHandPosition = sw.bonePos[0, (int)Bones.HandRight].y;
-            NewLeftHandPosition = sw.bonePos[0, (int)Bones.HandLeft].y;
-            NewHipXPosition = sw.bonePos[0, (int)Bones.HipCenter].x;
-            NewHipZetPosition = sw.bonePos[0, (int)Bones.HipCenter].z;
-
-            //Rotate the player based on hip position
-            rigidbody.AddTorque(new Vector3(0, rotationFactor * (NewHipXPosition - OldHipPosition), 0));
-            if (DifferenceBetweenOldAndNewHipPosition < 0.05)
-            {
-                rigidbody.angularVelocity = Vector3.zero;
-
-            }
-
-            changeLight();
-            //Get the difference between old a new positions
-            DifferenceBetweenOldAndNewRightHandPosition = Math.Abs(OldRightHandPosition - NewRightHandPosition);
-            DifferenceBetweenOldAndNewLeftHandPosition = Math.Abs(OldLeftHandPosition - NewLeftHandPosition);
-            DifferenceBetweenOldAndNewHipPosition = Math.Abs(OldHipZetPosition - NewHipZetPosition);
-            DifferenceBetweenOldAndNewHipZetPosition = Math.Abs(OldHipPosition - NewHipXPosition);
-
-            float forceByHands = Math.Max(DifferenceBetweenOldAndNewRightHandPosition, DifferenceBetweenOldAndNewLeftHandPosition);
-            rigidbody.AddForce(rigidbody.transform.TransformDirection((new Vector3(0, 0, 1)) * forceByHands * speedFactor));
-
-
-
-            //Animate
-            if (forceByHands > 0.03)
-            {
-                anim.SetInteger("Animation", 1);
-            }
-            else
-            {
-                anim.SetInteger("Animation", 0);
-            }
-
-
-            OldRightHandPosition = NewRightHandPosition;
-            OldLeftHandPosition = NewLeftHandPosition;
-            OldHipPosition = NewHipXPosition;
-            OldHipZetPosition = NewHipZetPosition;
-        }
-
-
-    }
+    
 
 
     void changeLight()

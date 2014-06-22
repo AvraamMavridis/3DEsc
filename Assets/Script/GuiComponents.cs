@@ -113,7 +113,15 @@ public class GuiComponents : MonoBehaviour {
                 PlayerController.rotationFactor = GUI.HorizontalSlider(new Rect(160, 65, 350, 20), PlayerController.rotationFactor, 0.0F, 1000F);
                 GUI.Label(new Rect(3, 80, 150, 20), "Angular Velocity: " + (player.rigidbody.angularVelocity.magnitude).ToString());
             }
-            else if (PlayerController.movement == PlayerController.MoveType.CenterPointKinectWithoutHands) {
+            else if (PlayerController.movement == PlayerController.MoveType.CenterPointKinectMovement)
+            {
+                GUI.Label(new Rect(3, 60, 150, 40), "No-speed circle radious: " + PlayerController.circleradious);
+                PlayerController.circleradious = GUI.HorizontalSlider(new Rect(200, 65, 300, 20), PlayerController.circleradious, 0.0F, 2F);
+                PlayerController.slide = GUI.Toggle(new Rect(10, 100, 100, 30), PlayerController.slide, "Slide");
+                print(PlayerController.slide);
+            }
+            else if (PlayerController.movement == PlayerController.MoveType.CenterPointKinectWithoutHands)
+            {
                 GUI.Label(new Rect(3, 60, 150, 40), "No-speed circle radious: " + PlayerController.circleradious);
                 PlayerController.circleradious = GUI.HorizontalSlider(new Rect(200, 65, 300, 20), PlayerController.circleradious, 0.0F, 2F);
                 PlayerController.slide = GUI.Toggle(new Rect(10, 100, 100, 30), PlayerController.slide, "Slide");
