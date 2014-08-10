@@ -262,7 +262,7 @@ public class PlayerController : MonoBehaviour
 
 
             //file.WriteLine(player.rigidbody.velocity.magnitude);
-            if (player.rigidbody.velocity.magnitude < 3)
+            if (player.rigidbody.velocity.magnitude < maximumSpeed)
             {
                 rigidbody.AddForce(rigidbody.transform.TransformDirection((new Vector3(0, 0, 1)) * forceByHands * speedFactor));
             }

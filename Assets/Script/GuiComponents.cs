@@ -104,9 +104,9 @@ public class GuiComponents : MonoBehaviour {
     void OnGUI() {
         if (GUIEnabled)
         {
-            GUI.Box(new Rect(0, 0, 550, 150), "Movement type : " + movementlabel);
+            GUI.Box(new Rect(0, 0, 550, 250), "Movement type : " + movementlabel);
             GUI.Label(new Rect(3, 20, 150, 20), "Speed Factor: " + PlayerController.speedFactor.ToString());
-            PlayerController.speedFactor = GUI.HorizontalSlider(new Rect(160, 25, 350, 20), PlayerController.speedFactor, 0.0F, 40F);
+            PlayerController.speedFactor = GUI.HorizontalSlider(new Rect(160, 25, 350, 20), PlayerController.speedFactor, 0.0F, 300F);
             GUI.Label(new Rect(3, 40, 150, 20), "Velocity: " + (player.rigidbody.velocity.magnitude).ToString());
             if((PlayerController.movement == PlayerController.MoveType.KinectMovement)|| (PlayerController.movement == PlayerController.MoveType.KeyboardMovement)){
                 GUI.Label(new Rect(3, 60, 150, 20), "Rotation Factor: " + PlayerController.rotationFactor.ToString());
@@ -115,16 +115,18 @@ public class GuiComponents : MonoBehaviour {
             }
             else if (PlayerController.movement == PlayerController.MoveType.CenterPointKinectMovement)
             {
-                GUI.Label(new Rect(3, 60, 150, 40), "No-speed circle radious: " + PlayerController.circleradious);
-                PlayerController.circleradious = GUI.HorizontalSlider(new Rect(200, 65, 300, 20), PlayerController.circleradious, 0.0F, 2F);
-                PlayerController.slide = GUI.Toggle(new Rect(10, 100, 100, 30), PlayerController.slide, "Slide");
+                GUI.Label(new Rect(3, 80, 180, 60), "Maximum Speed: " + PlayerController.maximumSpeed);
+                PlayerController.maximumSpeed = GUI.HorizontalSlider(new Rect(200, 85, 300, 40), PlayerController.maximumSpeed, 0.0F, 7.0F);
+                PlayerController.slide = GUI.Toggle(new Rect(10, 100, 100, 30), PlayerController.slide, "No Slide");
                 print(PlayerController.slide);
             }
             else if (PlayerController.movement == PlayerController.MoveType.CenterPointKinectWithoutHands)
             {
-                GUI.Label(new Rect(3, 60, 150, 40), "No-speed circle radious: " + PlayerController.circleradious);
+                GUI.Label(new Rect(3, 60, 180, 40), "No-speed circle radious: " + PlayerController.circleradious);
                 PlayerController.circleradious = GUI.HorizontalSlider(new Rect(200, 65, 300, 20), PlayerController.circleradious, 0.0F, 2F);
-                PlayerController.slide = GUI.Toggle(new Rect(10, 100, 100, 30), PlayerController.slide, "Slide");
+                GUI.Label(new Rect(3, 80, 180, 60), "Maximum Speed: " + PlayerController.maximumSpeed);
+                PlayerController.maximumSpeed = GUI.HorizontalSlider(new Rect(200, 85, 300, 40), PlayerController.maximumSpeed, 0.0F, 7.0F);
+                PlayerController.slide = GUI.Toggle(new Rect(10, 100, 100, 30), PlayerController.slide, "No Slide");
                 print(PlayerController.slide);
             }
             GUI.Label(new Rect(3, 120, 150, 20), "Camera distance: " + mainCamera.transform.position.y);

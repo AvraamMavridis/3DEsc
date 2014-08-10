@@ -49,6 +49,9 @@
      <Compile Include="Assets\Script\CameraMovement.cs" />
      <Compile Include="Assets\Script\Guard1.cs" />
      <Compile Include="Assets\Script\Guard2.cs" />
+     <Compile Include="Assets\Script\Guard3.cs" />
+     <Compile Include="Assets\Script\Guard4.cs" />
+     <Compile Include="Assets\Script\Guard5.cs" />
      <Compile Include="Assets\Script\GuiComponents.cs" />
      <Compile Include="Assets\Script\HumanBones.cs" />
      <Compile Include="Assets\Script\Kinect\KinectImgControllers\DisplayColor.cs" />
